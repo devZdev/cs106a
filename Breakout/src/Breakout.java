@@ -66,20 +66,22 @@ public class Breakout extends GraphicsProgram {
     }
 
     public void mousePressed(MouseEvent e) {
+        println("pressed");
         lastPoint = new GPoint(e.getX(), e.getY());
         paddle = getElementAt(lastPoint);
     }
 
     public void mouseDragged(MouseEvent e) {
         if(paddle != null) {
-            System.out.print(e.getY());
-            System.out.print(lastPoint.getY());
-            paddle.move(e.getX() - lastPoint.getX(), e.getY() - lastPoint.getY());
+            if(e.getX() >= 0 && e.getX() < (APPLICATION_WIDTH - PADDLE_WIDTH))
+                paddle.move(e.getX() - lastPoint.getX(), e.getY() - lastPoint.getY());
+                println(paddle);
             lastPoint = new GPoint(e.getPoint());
         }
     }
 
     public void setUpWorld(){
+        setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
         int ypos = BRICK_Y_OFFSET;
         int row = 0;
         for (int i = NBRICK_ROWS; i > 0; i--) {
