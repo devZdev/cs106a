@@ -7,13 +7,13 @@
  * This file will eventually implement the game of Breakout.
  */
 
-import acm.graphics.*;
-import acm.program.*;
-import acm.util.*;
+import acm.graphics.GObject;
+import acm.graphics.GPoint;
+import acm.graphics.GRect;
+import acm.program.GraphicsProgram;
 
-import java.applet.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseEvent;
 
 public class Breakout extends GraphicsProgram {
 
@@ -57,7 +57,7 @@ public class Breakout extends GraphicsProgram {
     /** Number of turns */
     private static final int NTURNS = 3;
 
-/* Method: run() */
+
     /** Runs the Breakout program. */
     public void init() {
         setUpWorld();
@@ -66,51 +66,47 @@ public class Breakout extends GraphicsProgram {
     }
 
     public void mousePressed(MouseEvent e) {
-        println("pressed");
-        lastPoint = new GPoint(e.getX(), e.getY());
+        lastPoint = new GPoint(e.getX(), paddleY);
         paddle = getElementAt(lastPoint);
     }
 
     public void mouseDragged(MouseEvent e) {
-        if(paddle != null) {
-            if(e.getX() >= 0 && e.getX() < (APPLICATION_WIDTH - PADDLE_WIDTH))
-                paddle.move(e.getX() - lastPoint.getX(), e.getY() - lastPoint.getY());
-                println(paddle);
-            lastPoint = new GPoint(e.getPoint());
+        if(paddle != null && e.getX() >= 0 && e.getX() <= APPLICATION_WIDTH) {
+            paddle.move(e.getX() - lastPoint.getX(), paddleY - lastPoint.getY());
+            lastPoint = new GPoint(e.getX(), paddleY);
         }
     }
 
     public void setUpWorld(){
         setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
-        int ypos = BRICK_Y_OFFSET;
+        int y = BRICK_Y_OFFSET;
         int row = 0;
         for (int i = NBRICK_ROWS; i > 0; i--) {
             row++;
             Color brickColor = getBrickColor(row);
-            int xpos = 0;
+            int x = 0;
             for(int k = NBRICKS_PER_ROW; k > 0; k--){
                 GRect brick = new GRect(BRICK_WIDTH, BRICK_HEIGHT);
                 brick.setColor(brickColor);
                 brick.setFillColor(brickColor);
                 brick.setFilled(true);
-                add(brick, xpos, ypos);
-                xpos = (xpos + BRICK_WIDTH + BRICK_SEP);
-                pause(10);
+                add(brick, x, y);
+                x = (x + BRICK_WIDTH + BRICK_SEP);
             }
-            ypos = ypos + BRICK_HEIGHT + BRICK_SEP;
+            y = y + BRICK_HEIGHT + BRICK_SEP;
         }
     }
 
     public void addPaddle() {
-        int ypos = getHeight() - (PADDLE_Y_OFFSET + PADDLE_HEIGHT);
-        paddleY = ypos;
-        int xpos = (getWidth()-PADDLE_WIDTH)/2;
+        int y = getHeight() - (PADDLE_Y_OFFSET + PADDLE_HEIGHT);
+        paddleY = y;
+        int x = (getWidth()-PADDLE_WIDTH)/2;
         GRect paddle = new GRect(PADDLE_WIDTH, PADDLE_HEIGHT);
         Color black = new Color(0, 0, 0);
         paddle.setColor(black);
         paddle.setFillColor(black);
         paddle.setFilled(true);
-        add(paddle, xpos, paddleY);
+        add(paddle, x, paddleY);
 
     }
 
