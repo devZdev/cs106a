@@ -8,9 +8,11 @@
  */
 
 import acm.graphics.GObject;
+import acm.graphics.GOval;
 import acm.graphics.GPoint;
 import acm.graphics.GRect;
 import acm.program.GraphicsProgram;
+import acm.util.RandomGenerator;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -59,26 +61,19 @@ public class Breakout extends GraphicsProgram {
 
 
     /** Runs the Breakout program. */
-    public void init() {
-        setUpWorld();
-        addPaddle();
-        addMouseListeners();
-    }
-
-    public void mousePressed(MouseEvent e) {
-        lastPoint = new GPoint(e.getX(), paddleY);
-        paddle = getElementAt(lastPoint);
-    }
-
-    public void mouseDragged(MouseEvent e) {
-        if(paddle != null && e.getX() >= 0 && e.getX() <= APPLICATION_WIDTH) {
-            paddle.move(e.getX() - lastPoint.getX(), paddleY - lastPoint.getY());
-            lastPoint = new GPoint(e.getX(), paddleY);
+    public void run() {
+        setup();
+        addBall();
+        while(ball.getX() < APPLICATION_WIDTH){
+            moveBall();
+            checkForCollision();
+            pause(10.0);
         }
     }
 
-    public void setUpWorld(){
+    public void setup() {
         setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
+        pause(10.0);
         int y = BRICK_Y_OFFSET;
         int row = 0;
         for (int i = NBRICK_ROWS; i > 0; i--) {
@@ -95,20 +90,60 @@ public class Breakout extends GraphicsProgram {
             }
             y = y + BRICK_HEIGHT + BRICK_SEP;
         }
+        addPaddle();
+        addMouseListeners();
+        vx = rgen.nextDouble(1.0, 3.0);
+        if(rgen.nextBoolean(0.5)) {
+            vx = -vx;
+        }
+        vy = 3.0;
     }
 
-    public void addPaddle() {
+    private void moveBall () {
+         ball.move(vx, vy);
+    }
+
+    private void checkForCollision() {
+        if(ball.getX() < 0 || ball.getX() > (APPLICATION_WIDTH - BALL_RADIUS)) {
+            vx = -vx;
+        }
+        if(ball.getY() < 0 || ball.getY() > APPLICATION_HEIGHT) {
+            vy = -vy;
+        }
+    }
+
+    public void mousePressed(MouseEvent e) {
+        lastPoint = new GPoint(e.getX(), paddleY);
+        paddle = getElementAt(lastPoint);
+    }
+
+    public void mouseDragged(MouseEvent e) {
+        if(paddle != null && e.getX() >= 0 && e.getX() <= APPLICATION_WIDTH) {
+            paddle.move(e.getX() - lastPoint.getX(), paddleY - lastPoint.getY());
+            lastPoint = new GPoint(e.getX(), paddleY);
+        }
+    }
+
+    private void addPaddle() {
         int y = getHeight() - (PADDLE_Y_OFFSET + PADDLE_HEIGHT);
         paddleY = y;
         int x = (getWidth()-PADDLE_WIDTH)/2;
         GRect paddle = new GRect(PADDLE_WIDTH, PADDLE_HEIGHT);
-        Color black = new Color(0, 0, 0);
         paddle.setColor(black);
         paddle.setFillColor(black);
         paddle.setFilled(true);
         add(paddle, x, paddleY);
 
     }
+
+    private void addBall() {
+        ball = new GOval(BALL_RADIUS, BALL_RADIUS);
+        ball.setFilled(true);
+        ball.setFillColor(black);
+        ball.setFilled(true);
+        add(ball, (APPLICATION_WIDTH - ball.getWidth())/2, (APPLICATION_HEIGHT - ball.getHeight())/2);
+    }
+
 
 
     private Color getBrickColor(int row) {
@@ -130,8 +165,12 @@ public class Breakout extends GraphicsProgram {
         }
     }
 
+    private Color black = new Color(0, 0, 0);
     private GPoint lastPoint;
     private GObject paddle;
     private int paddleY;
+    private GOval ball;
+    private double vx, vy;
+    private RandomGenerator rgen = RandomGenerator.getInstance();
 
 }
