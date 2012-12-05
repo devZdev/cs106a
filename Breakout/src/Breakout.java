@@ -96,7 +96,7 @@ public class Breakout extends GraphicsProgram {
         if(rgen.nextBoolean(0.5)) {
             vx = -vx;
         }
-        vy = 3.0;
+        vy = 6.0;
     }
 
     private void moveBall () {
@@ -104,6 +104,13 @@ public class Breakout extends GraphicsProgram {
     }
 
     private void checkForCollision() {
+        GObject obj = getElementAt(ball.getX(), ball.getY());
+        if(obj != null) {
+            vy = -vy;
+            if(obj != paddle) {
+                remove(obj);
+            }
+        }
         if(ball.getX() < 0 || ball.getX() > (APPLICATION_WIDTH - BALL_RADIUS)) {
             vx = -vx;
         }
